@@ -883,6 +883,9 @@ window.Raphael && window.Raphael.vml && function(R) {
         }
         return this;
     };
+    R._engine.getViewBox = function () {
+        return this._viewBox ? this._viewBox.slice() : null;
+    };
     R._engine.setViewBox = function (x, y, w, h, fit) {
         R.eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);
         var paperSize = this.getSize(),

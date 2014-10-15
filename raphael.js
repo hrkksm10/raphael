@@ -3956,6 +3956,16 @@
         return R._engine.setSize.call(this, width, height);
     };
     /*\
+     * Paper.getViewBox
+     [ method ]
+     **
+     * Get the view box of the paper.
+     **
+    \*/
+    paperproto.getViewBox = function () {
+        return R._engine.getViewBox.call(this);
+    };
+    /*\
      * Paper.setViewBox
      [ method ]
      **
@@ -7133,6 +7143,9 @@
         container.renderfix();
         return container;
     };
+    R._engine.getViewBox = function () {
+        return this._viewBox ? this._viewBox.slice() : null;
+    };
     R._engine.setViewBox = function (x, y, w, h, fit) {
         eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);
         var paperSize = this.getSize(),
@@ -8127,6 +8140,9 @@
             R._engine.setViewBox.apply(this, this._viewBox);
         }
         return this;
+    };
+    R._engine.getViewBox = function () {
+        return this._viewBox ? this._viewBox.slice() : null;
     };
     R._engine.setViewBox = function (x, y, w, h, fit) {
         R.eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);

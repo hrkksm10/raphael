@@ -1288,6 +1288,9 @@ window.Raphael && window.Raphael.svg && function(R) {
         container.renderfix();
         return container;
     };
+    R._engine.getViewBox = function () {
+        return this._viewBox ? this._viewBox.slice() : null;
+    };
     R._engine.setViewBox = function (x, y, w, h, fit) {
         eve("raphael.setViewBox", this, this._viewBox, [x, y, w, h, fit]);
         var paperSize = this.getSize(),

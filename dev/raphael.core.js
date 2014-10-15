@@ -3522,6 +3522,16 @@
         return R._engine.setSize.call(this, width, height);
     };
     /*\
+     * Paper.getViewBox
+     [ method ]
+     **
+     * Get the view box of the paper.
+     **
+    \*/
+    paperproto.getViewBox = function () {
+        return R._engine.getViewBox.call(this);
+    };
+    /*\
      * Paper.setViewBox
      [ method ]
      **
