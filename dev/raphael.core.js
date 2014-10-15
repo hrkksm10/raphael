@@ -3435,6 +3435,12 @@
     paperproto.text = function (x, y, text) {
         var out = R._engine.text(this, x || 0, y || 0, Str(text));
         this.__set__ && this.__set__.push(out);
+        if (R.svg) {
+            setTimeout(function () {
+                var tspanElement = out.node.getElementsByTagName('tspan')[0];
+                if (tspanElement) tspanElement.setAttribute('dy', 0);
+            }, 1);
+        }
         return out;
     };
     /*\
