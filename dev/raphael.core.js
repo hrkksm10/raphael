@@ -7,16 +7,13 @@
 // └─────────────────────────────────────────────────────────────────────┘ \\
 
 (function (glob, factory) {
+    var Raphael = factory(glob, glob.RaphaelEve);
+    // Otherwise expose Raphael to the global object as usual
+    glob.Raphael = Raphael;
     // AMD support
     if (typeof define === "function" && define.amd) {
         // Define as an anonymous module
-        define(["eve"], function( eve ) {
-            return factory(glob, eve);
-        });
-    } else {
-        // Browser globals (glob is window)
-        // Raphael adds itself to window
-        factory(glob, glob.eve);
+        define( "raphael", [], function () { return Raphael; } );
     }
 }(this, function (window, eve) {
     /*\
@@ -97,10 +94,6 @@
         g = {
             doc: document,
             win: window
-        },
-        oldRaphael = {
-            was: Object.prototype[has].call(g.win, "Raphael"),
-            is: g.win.Raphael
         },
         Paper = function () {
             /*\
@@ -5373,24 +5366,6 @@
         };
     })();
     /*\
-     * Raphael.ninja
-     [ method ]
-     **
-     * If you want to leave no trace of Raphaël (Well, Raphaël creates only one global variable `Raphael`, but anyway.) You can use `ninja` method.
-     * Beware, that in this case plugins could stop working, because they are depending on global variable existance.
-     **
-     = (object) Raphael object
-     > Usage
-     | (function (local_raphael) {
-     |     var paper = local_raphael(10, 10, 320, 200);
-     |     …
-     | })(Raphael.ninja());
-    \*/
-    R.ninja = function () {
-        oldRaphael.was ? (g.win.Raphael = oldRaphael.is) : delete Raphael;
-        return R;
-    };
-    /*\
      * Raphael.st
      [ property (object) ]
      **
@@ -5430,11 +5405,6 @@
         }
         isLoaded();
     })(document, "DOMContentLoaded");
-
-    // EXPOSE
-    // SVG and VML are appended just before the EXPOSE line
-    // Even with AMD, Raphael should be defined globally
-    oldRaphael.was ? (g.win.Raphael = R) : (Raphael = R);
 
     return R;
 }));
