@@ -5406,5 +5406,8 @@
         isLoaded();
     })(document, "DOMContentLoaded");
 
+    // EXPOSE
+    // SVG and VML are appended just before the EXPOSE line
+
     return R;
 }));
