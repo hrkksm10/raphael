@@ -1,5 +1,5 @@
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ "Raphaël 2.1.2k" - JavaScript Vector Library                         │ \\
+// │ "Raphaël 2.1.3k" - JavaScript Vector Library                         │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
@@ -83,7 +83,7 @@
             }
         }
     }
-    R.version = "2.1.2k";
+    R.version = "2.1.3k";
     R.eve = eve;
     var loaded,
         separator = /[, ]+/,
@@ -119,7 +119,7 @@
              | var c = paper.circle(10, 10, 10).attr({hue: .45});
              | // or even like this:
              | c.animate({hue: 1}, 1e3);
-             | 
+             |
              | // You could also create custom attribute
              | // with multiple parameters:
              | paper.customAttributes.hsb = function (h, s, b) {
@@ -385,7 +385,7 @@
      * Raphael.is
      [ method ]
      **
-     * Handfull replacement for `typeof` operator.
+     * Handful of replacements for `typeof` operator.
      > Parameters
      - o (…) any object or primitive
      - type (string) name of the type, i.e. “string”, “function”, “number”, etc.
@@ -407,7 +407,7 @@
     };
 
     function clone(obj) {
-        if (Object(obj) !== obj) {
+        if (typeof obj == "function" || Object(obj) !== obj) {
             return obj;
         }
         var res = new obj.constructor;
@@ -461,7 +461,7 @@
      **
      * Transform angle to degrees
      > Parameters
-     - deg (number) angle in radians
+     - rad (number) angle in radians
      = (number) angle in degrees.
     \*/
     R.deg = function (rad) {
@@ -684,8 +684,8 @@
         if (this.is(h, "object") && "h" in h && "s" in h && "b" in h) {
             v = h.b;
             s = h.s;
-            h = h.h;
             o = h.o;
+            h = h.h;
         }
         h *= 360;
         var R, G, B, X, C;
@@ -1409,8 +1409,8 @@
         }
         var l1 = bezlen.apply(0, bez1),
             l2 = bezlen.apply(0, bez2),
-            n1 = ~~(l1 / 5),
-            n2 = ~~(l2 / 5),
+            n1 = mmax(~~(l1 / 5), 1),
+            n2 = mmax(~~(l2 / 5), 1),
             dots1 = [],
             dots2 = [],
             xy = {},
@@ -1439,15 +1439,15 @@
                     xy[is.x.toFixed(4)] = is.y.toFixed(4);
                     var t1 = di.t + abs((is[ci] - di[ci]) / (di1[ci] - di[ci])) * (di1.t - di.t),
                         t2 = dj.t + abs((is[cj] - dj[cj]) / (dj1[cj] - dj[cj])) * (dj1.t - dj.t);
-                    if (t1 >= 0 && t1 <= 1 && t2 >= 0 && t2 <= 1) {
+                    if (t1 >= 0 && t1 <= 1.001 && t2 >= 0 && t2 <= 1.001) {
                         if (justCount) {
                             res++;
                         } else {
                             res.push({
                                 x: is.x,
                                 y: is.y,
-                                t1: t1,
-                                t2: t2
+                                t1: mmin(t1, 1),
+                                t2: mmin(t2, 1)
                             });
                         }
                     }
@@ -1976,11 +1976,11 @@
                 attrs = {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null},
                 attrs2 = {x: 0, y: 0, bx: 0, by: 0, X: 0, Y: 0, qx: null, qy: null},
                 processPath = function (path, d, pcom) {
-                    var nx, ny;
+                    var nx, ny, tq = {T:1, Q:1};
                     if (!path) {
                         return ["C", d.x, d.y, d.x, d.y, d.x, d.y];
                     }
-                    !(path[0] in {T:1, Q:1}) && (d.qx = d.qy = null);
+                    !(path[0] in tq) && (d.qx = d.qy = null);
                     switch (path[0]) {
                         case "M":
                             d.X = path[1];
@@ -3099,7 +3099,7 @@
      [ method ]
      **
      * Adds or retrieves given value asociated with given key.
-     ** 
+     **
      * See also @Element.removeData
      > Parameters
      - key (string) key to store data
@@ -3207,8 +3207,8 @@
      - mcontext (object) #optional context for moving handler
      - scontext (object) #optional context for drag start handler
      - econtext (object) #optional context for drag end handler
-     * Additionaly following `drag` events will be triggered: `drag.start.<id>` on start, 
-     * `drag.end.<id>` on end and `drag.move.<id>` on every move. When element will be dragged over another element 
+     * Additionaly following `drag` events will be triggered: `drag.start.<id>` on start,
+     * `drag.end.<id>` on end and `drag.move.<id>` on every move. When element will be dragged over another element
      * `drag.over.<id>` will be fired as well.
      *
      * Start event and start handler will be called in specified context or in context of the element with following parameters:
@@ -3541,7 +3541,7 @@
      * Paper.setViewBox
      [ method ]
      **
-     * Sets the view box of the paper. Practically it gives you ability to zoom and pan whole paper surface by 
+     * Sets the view box of the paper. Practically it gives you ability to zoom and pan whole paper surface by
      * specifying new boundaries.
      **
      > Parameters
@@ -4014,7 +4014,7 @@
     elproto.getPath = function () {
         var path,
             getPath = R._getPath[this.type];
-        
+
         if (this.type == "text" || this.type == "set") {
             return;
         }
@@ -4300,8 +4300,8 @@
             }
         }
         return element;
-        // 
-        // 
+        //
+        //
         // var a = params ? R.animation(params, ms, easing, callback) : anim,
         //     status = element.status(anim);
         // return this.animate(a).status(a, status * anim.ms / a.ms);
@@ -4943,7 +4943,7 @@
      * Set.clear
      [ method ]
      **
-     * Removeds all elements from the set
+     * Removes all elements from the set
     \*/
     setproto.clear = function () {
         while (this.length) {
