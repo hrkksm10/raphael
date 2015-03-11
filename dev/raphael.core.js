@@ -1,5 +1,5 @@
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ "Raphaël 2.1.3k" - JavaScript Vector Library                         │ \\
+// │ "Raphaël 2.1.4k" - JavaScript Vector Library                         │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
 // │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
@@ -83,7 +83,7 @@
             }
         }
     }
-    R.version = "2.1.3k";
+    R.version = "2.1.4k";
     R.eve = eve;
     var loaded,
         separator = /[, ]+/,
@@ -465,7 +465,7 @@
      = (number) angle in degrees.
     \*/
     R.deg = function (rad) {
-        return rad * 180 / PI % 360;
+        return Math.round ((rad * 180 / PI% 360)* 1000) / 1000;
     };
     /*\
      * Raphael.snapTo

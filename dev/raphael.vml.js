@@ -906,7 +906,7 @@ window.Raphael && window.Raphael.vml && function(R) {
         this._viewBoxShift = {
             dx: -x,
             dy: -y,
-            scale: size
+            scale: paperSize
         };
         this.forEach(function (el) {
             el.transform("...");

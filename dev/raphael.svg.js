@@ -127,7 +127,7 @@ window.Raphael && window.Raphael.svg && function(R) {
             }
         }
         $(o, {
-            fill: "url(" + document.location + "#" + id + ")",
+            fill: "url('" + document.location + "#" + id + "')",
             opacity: 1,
             "fill-opacity": 1
         });
@@ -607,7 +607,7 @@ window.Raphael && window.Raphael.svg && function(R) {
         } else {
             return node;
         }
-    }
+    },
     Element = function (node, svg) {
         var X = 0,
             Y = 0;
