@@ -3871,8 +3871,8 @@
         this.__set__ && this.__set__.push(out);
         if (R.svg) {
             setTimeout(function () {
-                var tspanElement = out.node.getElementsByTagName('tspan')[0];
-                if (tspanElement) tspanElement.setAttribute('dy', 0);
+                var tspanElements = out.node.getElementsByTagName('tspan');
+                if (tspanElements[0] && !tspanElements[1]) tspanElement.setAttribute('dy', 3.5);
             }, 1);
         }
         return out;
