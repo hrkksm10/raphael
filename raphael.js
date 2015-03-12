@@ -3870,9 +3870,10 @@
         var out = R._engine.text(this, x || 0, y || 0, Str(text));
         this.__set__ && this.__set__.push(out);
         if (R.svg) {
+            // Not support Multiple lines
             setTimeout(function () {
                 var tspanElements = out.node.getElementsByTagName('tspan');
-                if (tspanElements[0] && !tspanElements[1]) tspanElement.setAttribute('dy', 3.5);
+                if (tspanElements[0] && !tspanElements[1]) tspanElements[0].setAttribute('dy', 3.5);
             }, 1);
         }
         return out;
