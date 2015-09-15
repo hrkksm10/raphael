@@ -1,3 +1,15 @@
+2.2.0 • WIP
+------------------
+
+  * Reduce transform string to avoid long parsing times after several transformations
+  * raphael.amd.js as main in package.json.
+  * raphael.amd.js version to work with Browserify.
+  * Can't set glow with opacity 0
+  * Using origin and pathname with gradient urls, urls with # weren't being resolved correctly
+  * Defined nodeps version, and changed how raphael is loaded
+  * Set stop-opacity in gradient defs
+  * Fixed rounding issue in RGB formatter
+
 2.1.4 • 2015-03-09
 ------------------
 

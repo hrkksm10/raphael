@@ -1,11 +1,3 @@
-// ┌────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2.1.4k - JavaScript Vector Library                          │ \\
-// ├────────────────────────────────────────────────────────────────────┤ \\
-// │ Copyright © 2008-2012 Dmitry Baranovskiy (http://raphaeljs.com)    │ \\
-// │ Copyright © 2008-2012 Sencha Labs (http://sencha.com)              │ \\
-// ├────────────────────────────────────────────────────────────────────┤ \\
-// │ Licensed under the MIT (http://raphaeljs.com/license.html) license.│ \\
-// └────────────────────────────────────────────────────────────────────┘ \\
 // Copyright (c) 2013 Adobe Systems Incorporated. All rights reserved.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,16 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ┌────────────────────────────────────────────────────────────┐ \\
-// │ Eve 0.5.0 - JavaScript Events Library                      │ \\
+// │ Eve 0.4.2 - JavaScript Events Library                      │ \\
 // ├────────────────────────────────────────────────────────────┤ \\
 // │ Author Dmitry Baranovskiy (http://dmitry.baranovskiy.com/) │ \\
 // └────────────────────────────────────────────────────────────┘ \\
-
-(function (glob) {
-    var version = "0.5.0",
+(function (glob, factory) {
+    if (typeof define === "function" && define.amd) {
+        define("eve", function() {
+            return factory();
+        });
+    } else if (typeof exports === "object") {
+        module.exports = factory();
+    } else {
+        glob.eve = factory();
+    }
+}(this, function(){
+    var version = "0.4.2",
         has = "hasOwnProperty",
         separator = /[\.\/]/,
-        comaseparator = /\s*,\s*/,
         wildcard = "*",
         fun = function () {},
         numsort = function (a, b) {
@@ -38,26 +38,6 @@
         current_event,
         stop,
         events = {n: {}},
-        firstDefined = function () {
-            for (var i = 0, ii = this.length; i < ii; i++) {
-                if (typeof this[i] != "undefined") {
-                    return this[i];
-                }
-            }
-        },
-        lastDefined = function () {
-            var i = this.length;
-            while (--i) {
-                if (typeof this[i] != "undefined") {
-                    return this[i];
-                }
-            }
-        },
-        objtos = Object.prototype.toString,
-        Str = String,
-        isArray = Array.isArray || function (ar) {
-            return ar instanceof Array || objtos.call(ar) == "[object Array]";
-        };
     /*\
      * eve
      [ method ]
@@ -70,9 +50,10 @@
      - scope (object) context for the event handlers
      - varargs (...) the rest of arguments will be sent to event handlers
 
-     = (object) array of returned values from the listeners. Array has two methods `.firstDefined()` and `.lastDefined()` to get first or last not `undefined` value.
-    \*/
+     = (object) array of returned values from the listeners
+     \*/
         eve = function (name, scope) {
+            name = String(name);
             var e = events,
                 oldstop = stop,
                 args = Array.prototype.slice.call(arguments, 2),
@@ -85,8 +66,6 @@
                 out = [],
                 ce = current_event,
                 errors = [];
-            out.firstDefined = firstDefined;
-            out.lastDefined = lastDefined;
             current_event = name;
             stop = 0;
             for (var i = 0, ii = listeners.length; i < ii; i++) if ("zIndex" in listeners[i]) {
@@ -132,10 +111,10 @@
             }
             stop = oldstop;
             current_event = ce;
-            return out;
+            return out.length ? out : null;
         };
-        // Undocumented. Debug only.
-        eve._events = events;
+    // Undocumented. Debug only.
+    eve._events = events;
     /*\
      * eve.listeners
      [ method ]
@@ -147,9 +126,9 @@
      - name (string) name of the event, dot (`.`) or slash (`/`) separated
 
      = (array) array of event handlers
-    \*/
+     \*/
     eve.listeners = function (name) {
-        var names = isArray(name) ? name : name.split(separator),
+        var names = name.split(separator),
             e = events,
             item,
             items,
@@ -179,25 +158,7 @@
         }
         return out;
     };
-    /*\
-     * eve.separator
-     [ method ]
 
-     * If for some reasons you don’t like default separators (`.` or `/`) you can specify yours
-     * here. Be aware that if you pass a string longer than one character it will be treated as
-     * a list of characters.
-
-     - separator (string) new separator. Empty string resets to default: `.` or `/`.
-    \*/
-    eve.separator = function (sep) {
-        if (sep) {
-            sep = Str(sep).replace(/(?=[\.\^\]\[\-])/g, "\\");
-            sep = "[" + sep + "]";
-            separator = new RegExp(sep);
-        } else {
-            separator = /[\.\/]/;
-        }
-    };
     /*\
      * eve.on
      [ method ]
@@ -207,44 +168,37 @@
      | eve("mouse.under.floor"); // triggers f
      * Use @eve to trigger the listener.
      **
+     > Arguments
+     **
      - name (string) name of the event, dot (`.`) or slash (`/`) separated, with optional wildcards
      - f (function) event handler function
      **
-     - name (array) if you don’t want to use separators, you can use array of strings
-     - f (function) event handler function
-     **
-     = (function) returned function accepts a single numeric parameter that represents z-index of the handler. It is an optional feature and only used when you need to ensure that some subset of handlers will be invoked in a given order, despite of the order of assignment. 
+     = (function) returned function accepts a single numeric parameter that represents z-index of the handler. It is an optional feature and only used when you need to ensure that some subset of handlers will be invoked in a given order, despite of the order of assignment.
      > Example:
      | eve.on("mouse", eatIt)(2);
      | eve.on("mouse", scream);
      | eve.on("mouse", catchIt)(1);
-     * This will ensure that `catchIt` function will be called before `eatIt`.
+     * This will ensure that `catchIt()` function will be called before `eatIt()`.
      *
      * If you want to put your handler before non-indexed handlers, specify a negative value.
      * Note: I assume most of the time you don’t need to worry about z-index, but it’s nice to have this feature “just in case”.
-    \*/
+     \*/
     eve.on = function (name, f) {
+        name = String(name);
         if (typeof f != "function") {
             return function () {};
         }
-        var names = isArray(name) ? (isArray(name[0]) ? name : [name]) : Str(name).split(comaseparator);
+        var names = name.split(separator),
+            e = events;
         for (var i = 0, ii = names.length; i < ii; i++) {
-            (function (name) {
-                var names = isArray(name) ? name : Str(name).split(separator),
-                    e = events,
-                    exist;
-                for (var i = 0, ii = names.length; i < ii; i++) {
-                    e = e.n;
-                    e = e.hasOwnProperty(names[i]) && e[names[i]] || (e[names[i]] = {n: {}});
-                }
-                e.f = e.f || [];
-                for (i = 0, ii = e.f.length; i < ii; i++) if (e.f[i] == f) {
-                    exist = true;
-                    break;
-                }
-                !exist && e.f.push(f);
-            }(names[i]));
+            e = e.n;
+            e = e.hasOwnProperty(names[i]) && e[names[i]] || (e[names[i]] = {n: {}});
         }
+        e.f = e.f || [];
+        for (i = 0, ii = e.f.length; i < ii; i++) if (e.f[i] == f) {
+            return fun;
+        }
+        e.f.push(f);
         return function (zIndex) {
             if (+zIndex == +zIndex) {
                 f.zIndex = +zIndex;
@@ -266,7 +220,7 @@
      - event (string) event name
      - varargs (…) and any other arguments
      = (function) possible event handler function
-    \*/
+     \*/
     eve.f = function (event) {
         var attrs = [].slice.call(arguments, 1);
         return function () {
@@ -278,7 +232,7 @@
      [ method ]
      **
      * Is used inside an event handler to stop the event, preventing any subsequent listeners from firing.
-    \*/
+     \*/
     eve.stop = function () {
         stop = 1;
     };
@@ -295,13 +249,12 @@
      = (string) name of the event, if `subname` is not specified
      * or
      = (boolean) `true`, if current event’s name contains `subname`
-    \*/
+     \*/
     eve.nt = function (subname) {
-        var cur = isArray(current_event) ? current_event.join(".") : current_event;
         if (subname) {
-            return new RegExp("(?:\\.|\\/|^)" + subname + "(?:\\.|\\/|$)").test(cur);
+            return new RegExp("(?:\\.|\\/|^)" + subname + "(?:\\.|\\/|$)").test(current_event);
         }
-        return cur;
+        return current_event;
     };
     /*\
      * eve.nts
@@ -311,9 +264,9 @@
      **
      **
      = (array) names of the event
-    \*/
+     \*/
     eve.nts = function () {
-        return isArray(current_event) ? current_event : current_event.split(separator);
+        return current_event.split(separator);
     };
     /*\
      * eve.off
@@ -326,27 +279,20 @@
      **
      - name (string) name of the event, dot (`.`) or slash (`/`) separated, with optional wildcards
      - f (function) event handler function
-    \*/
+     \*/
     /*\
      * eve.unbind
      [ method ]
      **
      * See @eve.off
-    \*/
+     \*/
     eve.off = eve.unbind = function (name, f) {
         if (!name) {
             eve._events = events = {n: {}};
             return;
         }
-        var names = isArray(name) ? (isArray(name[0]) ? name : [name]) : Str(name).split(comaseparator);
-        if (names.length > 1) {
-            for (var i = 0, ii = names.length; i < ii; i++) {
-                eve.off(names[i], f);
-            }
-            return;
-        }
-        names = isArray(name) ? name : Str(name).split(separator);
-        var e,
+        var names = name.split(separator),
+            e,
             key,
             splice,
             i, ii, j, jj,
@@ -412,10 +358,10 @@
      - f (function) event handler function
      **
      = (function) same return function as @eve.on
-    \*/
+     \*/
     eve.once = function (name, f) {
         var f2 = function () {
-            eve.off(name, f2);
+            eve.unbind(name, f2);
             return f.apply(this, arguments);
         };
         return eve.on(name, f2);
@@ -425,31 +371,34 @@
      [ property (string) ]
      **
      * Current version of the library.
-    \*/
+     \*/
     eve.version = version;
     eve.toString = function () {
         return "You are running Eve " + version;
     };
-    glob.RaphaelEve = eve;
-})(window || this);
-// ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ "Raphaël 2.1.4k" - JavaScript Vector Library                         │ \\
-// ├─────────────────────────────────────────────────────────────────────┤ \\
-// │ Copyright (c) 2008-2011 Dmitry Baranovskiy (http://raphaeljs.com)   │ \\
-// │ Copyright (c) 2008-2011 Sencha Labs (http://sencha.com)             │ \\
-// │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
-// └─────────────────────────────────────────────────────────────────────┘ \\
+
+    return eve;
+}));
+
+// ┌────────────────────────────────────────────────────────────────────┐ \\
+// │ Raphaël 2.1.4 - JavaScript Vector Library                      │ \\
+// ├────────────────────────────────────────────────────────────────────┤ \\
+// │ Core Module                                                        │ \\
+// ├────────────────────────────────────────────────────────────────────┤ \\
+// │ Licensed under the MIT (http://raphaeljs.com/license.html) license.│ \\
+// └────────────────────────────────────────────────────────────────────┘ \\
 
 (function (glob, factory) {
-    var Raphael = factory(glob, glob.RaphaelEve);
-    // Otherwise expose Raphael to the global object as usual
-    glob.Raphael = Raphael;
-    // AMD support
     if (typeof define === "function" && define.amd) {
-        // Define as an anonymous module
-        define( "raphael", [], function () { return Raphael; } );
+        define("raphael.core", ["eve"], function(eve) {
+            return factory(eve);
+        });
+    } else if (typeof exports === "object") {
+        module.exports = factory(require("eve"));
+    } else {
+        glob.Raphael = factory(glob.eve);
     }
-}(this, function (window, eve) {
+}(this, function (eve) {
     /*\
      * Raphael
      [ method ]
@@ -517,7 +466,7 @@
             }
         }
     }
-    R.version = "2.1.4k";
+    R.version = "2.1.4";
     R.eve = eve;
     var loaded,
         separator = /[, ]+/,
@@ -1429,7 +1378,8 @@
      = (string) hex representation of the colour.
     \*/
     R.rgb = cacher(function (r, g, b) {
-        return "#" + (16777216 | b | (g << 8) | (r << 16)).toString(16).slice(1);
+        function round(x) { return (x + 0.5) | 0; }
+        return "#" + (16777216 | round(b) | (round(g) << 8) | (round(r) << 16)).toString(16).slice(1);
     });
     /*\
      * Raphael.getColor
@@ -2550,6 +2500,7 @@
                 if (dot.color.error) {
                     return null;
                 }
+                dot.opacity = dot.color.opacity;
                 dot.color = dot.color.hex;
                 par[2] && (dot.offset = par[2] + "%");
                 dots.push(dot);
@@ -3128,26 +3079,6 @@
             }
         };
     })(Matrix.prototype);
-
-    // WebKit rendering bug workaround method
-    var version = navigator.userAgent.match(/Version\/(.*?)\s/) || navigator.userAgent.match(/Chrome\/(\d+)/);
-    if ((navigator.vendor == "Apple Computer, Inc.") && (version && version[1] < 4 || navigator.platform.slice(0, 2) == "iP") ||
-        (navigator.vendor == "Google Inc." && version && version[1] < 8)) {
-        /*\
-         * Paper.safari
-         [ method ]
-         **
-         * There is an inconvenient rendering bug in Safari (WebKit):
-         * sometimes the rendering should be forced.
-         * This method should help with dealing with this bug.
-        \*/
-        paperproto.safari = function () {
-            var rect = this.rect(-99, -99, this.width + 99, this.height + 99).attr({stroke: "none"});
-            setTimeout(function () {rect.remove();});
-        };
-    } else {
-        paperproto.safari = fun;
-    }
 
     var preventDefault = function () {
         this.returnValue = false;
@@ -4267,7 +4198,7 @@
         var s = {
             width: (glow.width || 10) + (+this.attr("stroke-width") || 1),
             fill: glow.fill || false,
-            opacity: glow.opacity || .5,
+            opacity: glow.opacity == null ? .5 : glow.opacity,
             offsetx: glow.offsetx || 0,
             offsety: glow.offsety || 0,
             color: glow.color || "#000"
@@ -4692,7 +4623,6 @@
                     }
                 }
             }
-            R.svg && that && that.paper && that.paper.safari();
             animationElements.length && requestAnimFrame(animation);
         },
         upto255 = function (color) {
@@ -5857,8 +5787,11 @@
         isLoaded();
     })(document, "DOMContentLoaded");
 
+    return R;
+}));
+
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël - JavaScript Vector Library                                 │ \\
+// │ Raphaël 2.1.4 - JavaScript Vector Library                       │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ SVG Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -5867,10 +5800,21 @@
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
 
-(function(){
-    if (!R.svg) {
+(function (glob, factory) {
+    if (typeof define === "function" && define.amd) {
+        define("raphael.svg", ["raphael.core"], function(raphael) {
+            return factory(raphael);
+        });
+    } else if (typeof exports === "object") {
+        factory(require("./raphael.core"));
+    } else {
+        factory(glob.Raphael);
+    }
+}(this, function(R) {
+    if (R && !R.svg) {
         return;
     }
+
     var has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
@@ -5983,13 +5927,14 @@
                 for (var i = 0, ii = dots.length; i < ii; i++) {
                     el.appendChild($("stop", {
                         offset: dots[i].offset ? dots[i].offset : i ? "100%" : "0%",
-                        "stop-color": dots[i].color || "#fff"
+                        "stop-color": dots[i].color || "#fff",
+                        "stop-opacity": isFinite(dots[i].opacity) ? dots[i].opacity : 1
                     }));
                 }
             }
         }
         $(o, {
-            fill: "url('" + document.location + "#" + id + "')",
+            fill: "url('" + document.location.origin + document.location.pathname + "#" + id + "')",
             opacity: 1,
             "fill-opacity": 1
         });
@@ -6142,8 +6087,6 @@
         }
     },
     dasharray = {
-        "": [0],
-        "none": [0],
         "-": [3, 1],
         ".": [1, 1],
         "-.": [3, 1, 1, 1],
@@ -6166,6 +6109,9 @@
                 dashes[i] = value[i] * width + ((i % 2) ? 1 : -1) * butt;
             }
             $(o.node, {"stroke-dasharray": dashes.join(",")});
+        }
+        else {
+          $(o.node, {"stroke-dasharray": "none"});
         }
     },
     setFillAndStroke = function (o, params) {
@@ -6351,7 +6297,6 @@
                                         h = this.offsetHeight;
                                     $(el, {width: w, height: h});
                                     $(ig, {width: w, height: h});
-                                    o.paper.safari();
                                 });
                             })(el);
                             o.paper.defs.appendChild(el);
@@ -6716,6 +6661,9 @@
             this.attr({"stroke-width": sw});
         }
 
+        //Reduce transform string
+        _.transform = this.matrix.toTransformString();
+
         return this;
     };
     /*\
@@ -6726,7 +6674,7 @@
      = (object) @Element
     \*/
     elproto.hide = function () {
-        !this.removed && this.paper.safari(this.node.style.display = "none");
+        if(!this.removed) this.node.style.display = "none";
         return this;
     };
     /*\
@@ -6737,7 +6685,7 @@
      = (object) @Element
     \*/
     elproto.show = function () {
-        !this.removed && this.paper.safari(this.node.style.display = "");
+        if(!this.removed) this.node.style.display = "";
         return this;
     };
     /*\
@@ -6847,7 +6795,7 @@
      o ry (number) vertical radius of the ellipse
      o src (string) image URL, only works for @Element.image element
      o stroke (string) stroke colour
-     o stroke-dasharray (string) [“”, “`-`”, “`.`”, “`-.`”, “`-..`”, “`. `”, “`- `”, “`--`”, “`- .`”, “`--.`”, “`--..`”]
+     o stroke-dasharray (string) [“”, “none”, “`-`”, “`.`”, “`-.`”, “`-..`”, “`. `”, “`- `”, “`--`”, “`- .`”, “`--.`”, “`--..`”]
      o stroke-linecap (string) [“`butt`”, “`square`”, “`round`”]
      o stroke-linejoin (string) [“`bevel`”, “`round`”, “`miter`”]
      o stroke-miterlimit (number)
@@ -7265,10 +7213,10 @@
             };
         })(method);
     }
-})();
+}));
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël - JavaScript Vector Library                                 │ \\
+// │ Raphaël 2.1.4 - JavaScript Vector Library                       │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ VML Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -7277,10 +7225,21 @@
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
 
-(function(){
-    if (!R.vml) {
+(function (glob, factory) {
+    if (typeof define === "function" && define.amd) {
+        define("raphael.vml", ["raphael.core"], function(raphael) {
+            return factory(raphael);
+        });
+    } else if (typeof exports === "object") {
+        factory(require("./raphael.core"));
+    } else {
+        factory(glob.Raphael);
+    }
+}(this, function(R) {
+    if (R && !R.vml) {
         return;
     }
+
     var has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
@@ -7496,7 +7455,7 @@
         if ("arrow-end" in params) {
             addArrow(res, params["arrow-end"], 1);
         }
-        if (params.opacity != null || 
+        if (params.opacity != null ||
             params["stroke-width"] != null ||
             params.fill != null ||
             params.src != null ||
@@ -7575,7 +7534,7 @@
             params["stroke-width"] && (stroke.weight = width);
             width && width < 1 && (opacity *= width) && (stroke.weight = 1);
             stroke.opacity = opacity;
-        
+
             params["stroke-linejoin"] && (stroke.joinstyle = params["stroke-linejoin"] || "miter");
             stroke.miterlimit = params["stroke-miterlimit"] || 8;
             params["stroke-linecap"] && (stroke.endcap = params["stroke-linecap"] == "butt" ? "flat" : params["stroke-linecap"] == "square" ? "square" : "round");
@@ -7622,7 +7581,7 @@
                 res._.dirty = 1;
                 break;
             }
-        
+
             // text-anchor emulation
             switch (a["text-anchor"]) {
                 case "start":
@@ -7835,7 +7794,7 @@
         }
         cx = cx == null ? bbox.x + bbox.width / 2 : cx;
         cy = cy == null ? bbox.y + bbox.height / 2 : cy;
-    
+
         this.transform(this._.transform.concat([["s", sx, sy, cx, cy]]));
         this._.dirtyT = 1;
         return this;
@@ -8278,10 +8237,32 @@
             };
         })(method);
     }
-})();
+}));
 
-    // EXPOSE
-    // SVG and VML are appended just before the EXPOSE line
+// ┌────────────────────────────────────────────────────────────────────┐ \\
+// │ Raphaël @VERSION - JavaScript Vector Library                       │ \\
+// ├────────────────────────────────────────────────────────────────────┤ \\
+// │ Copyright © 2008-2012 Dmitry Baranovskiy (http://raphaeljs.com)    │ \\
+// │ Copyright © 2008-2012 Sencha Labs (http://sencha.com)              │ \\
+// ├────────────────────────────────────────────────────────────────────┤ \\
+// │ Licensed under the MIT (http://raphaeljs.com/license.html) license.│ \\
+// └────────────────────────────────────────────────────────────────────┘ \\
 
-    return R;
+(function (glob, factory) {
+    if (typeof define === "function" && define.amd) {
+        define("raphael", ["raphael.core", "raphael.svg", "raphael.vml"], function(Raphael) {
+            return (glob.Raphael = factory(Raphael));
+        });
+    } else if (typeof exports === "object") {
+        var raphael = require("raphael.core");
+
+        require("raphael.svg");
+        require("raphael.vml");
+
+        module.exports = factory(raphael);
+    } else {
+        glob.Raphael = factory(glob.Raphael);
+    }
+}(this, function (Raphael) {
+    return Raphael.ninja();
 }));

@@ -1,5 +1,5 @@
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël - JavaScript Vector Library                                 │ \\
+// │ Raphaël @@VERSION - JavaScript Vector Library                       │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ SVG Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -8,7 +8,21 @@
 // │ Licensed under the MIT (http://raphaeljs.com/license.html) license. │ \\
 // └─────────────────────────────────────────────────────────────────────┘ \\
 
-window.Raphael && window.Raphael.svg && function(R) {
+(function (glob, factory) {
+    if (typeof define === "function" && define.amd) {
+        define("raphael.svg", ["raphael.core"], function(raphael) {
+            return factory(raphael);
+        });
+    } else if (typeof exports === "object") {
+        factory(require("./raphael.core"));
+    } else {
+        factory(glob.Raphael);
+    }
+}(this, function(R) {
+    if (R && !R.svg) {
+        return;
+    }
+
     var has = "hasOwnProperty",
         Str = String,
         toFloat = parseFloat,
@@ -121,13 +135,14 @@ window.Raphael && window.Raphael.svg && function(R) {
                 for (var i = 0, ii = dots.length; i < ii; i++) {
                     el.appendChild($("stop", {
                         offset: dots[i].offset ? dots[i].offset : i ? "100%" : "0%",
-                        "stop-color": dots[i].color || "#fff"
+                        "stop-color": dots[i].color || "#fff",
+                        "stop-opacity": isFinite(dots[i].opacity) ? dots[i].opacity : 1
                     }));
                 }
             }
         }
         $(o, {
-            fill: "url('" + document.location + "#" + id + "')",
+            fill: "url('" + document.location.origin + document.location.pathname + "#" + id + "')",
             opacity: 1,
             "fill-opacity": 1
         });
@@ -280,8 +295,6 @@ window.Raphael && window.Raphael.svg && function(R) {
         }
     },
     dasharray = {
-        "": [0],
-        "none": [0],
         "-": [3, 1],
         ".": [1, 1],
         "-.": [3, 1, 1, 1],
@@ -304,6 +317,9 @@ window.Raphael && window.Raphael.svg && function(R) {
                 dashes[i] = value[i] * width + ((i % 2) ? 1 : -1) * butt;
             }
             $(o.node, {"stroke-dasharray": dashes.join(",")});
+        }
+        else {
+          $(o.node, {"stroke-dasharray": "none"});
         }
     },
     setFillAndStroke = function (o, params) {
@@ -489,7 +505,6 @@ window.Raphael && window.Raphael.svg && function(R) {
                                         h = this.offsetHeight;
                                     $(el, {width: w, height: h});
                                     $(ig, {width: w, height: h});
-                                    o.paper.safari();
                                 });
                             })(el);
                             o.paper.defs.appendChild(el);
@@ -854,6 +869,9 @@ window.Raphael && window.Raphael.svg && function(R) {
             this.attr({"stroke-width": sw});
         }
 
+        //Reduce transform string
+        _.transform = this.matrix.toTransformString();
+
         return this;
     };
     /*\
@@ -864,7 +882,7 @@ window.Raphael && window.Raphael.svg && function(R) {
      = (object) @Element
     \*/
     elproto.hide = function () {
-        !this.removed && this.paper.safari(this.node.style.display = "none");
+        if(!this.removed) this.node.style.display = "none";
         return this;
     };
     /*\
@@ -875,7 +893,7 @@ window.Raphael && window.Raphael.svg && function(R) {
      = (object) @Element
     \*/
     elproto.show = function () {
-        !this.removed && this.paper.safari(this.node.style.display = "");
+        if(!this.removed) this.node.style.display = "";
         return this;
     };
     /*\
@@ -985,7 +1003,7 @@ window.Raphael && window.Raphael.svg && function(R) {
      o ry (number) vertical radius of the ellipse
      o src (string) image URL, only works for @Element.image element
      o stroke (string) stroke colour
-     o stroke-dasharray (string) [“”, “`-`”, “`.`”, “`-.`”, “`-..`”, “`. `”, “`- `”, “`--`”, “`- .`”, “`--.`”, “`--..`”]
+     o stroke-dasharray (string) [“”, “none”, “`-`”, “`.`”, “`-.`”, “`-..`”, “`. `”, “`- `”, “`--`”, “`- .`”, “`--.`”, “`--..`”]
      o stroke-linecap (string) [“`butt`”, “`square`”, “`round`”]
      o stroke-linejoin (string) [“`bevel`”, “`round`”, “`miter`”]
      o stroke-miterlimit (number)
@@ -1403,4 +1421,4 @@ window.Raphael && window.Raphael.svg && function(R) {
             };
         })(method);
     }
-}(window.Raphael);
+}));

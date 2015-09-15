@@ -4,14 +4,19 @@ Visit the library website for more information: [http://raphaeljs.com](http://ra
 
 ## Quickstart guide
 
+You need to have NPM installed to build the library.
+
 * `git clone https://github.com/DmitryBaranovskiy/raphael.git`
-* `git submodule init && git submodule update && cd dev && npm install`
+* `npm install && ./node_modules/grunt-cli/bin/grunt` or just `npm install && grunt` if you have grunt already installed
 
 ## Dependencies
 * [eve](https://github.com/adobe-webplatform/eve)
-* [grunt](https://github.com/gruntjs/grunt)
 
-## Loading
+You have the `raphael/raphael-min.js` files that has `eve` bundled inside, and `raphael-nodeps/raphael-nodeps-min.js` 
+where `eve` must be loaded by you first (you can try with the one in the `dev/` folder).
+For AMD loading like Browserify, you can use raphael.amd.js.
+
+## Where to start
 Check [Raphael-boilerplate](https://github.com/tomasAlabes/raphael-boilerplate) to see examples of loading.
 
 Raphael can be loaded in a script tag or with AMD:
@@ -30,26 +35,6 @@ As there are not automated tests, we will use the feedback from the users for th
 You can use the `raphaelTest.html` to try things, you need to start a server in the root dir to start testing things there.
 Something like running `python -m SimpleHTTPServer` in the `raphael` directory and hitting `http://localhost:8000/dev/raphaelTest.html` with the browser.
 
-## Want to contribute?
-
-All changes in code must go to `raphael.core`, `raphael.svg` or `raphael.vml`.
-`raphael.js` and `raphael-min.js` are generated files, generated after running `grunt` in the `dev` directory.
-
-After changing the core/vml/svg files, execute `grunt` in the dev folder to generate the minified version, make a commit and you are ready to make a pull request!
-Remember that if you want to add a functionality it must be present in the vml and svg versions, **no svg-only features will be accepted.**
-
-## Found an issue?
-
-First search for similar issues to make sure you don't repeat an existing one.
-
-Then please create a fiddle ([jsfiddle](http://jsfiddle.net/SSJJT/)) recreating the bug so we can find out what the problem is more easily (or be a hero and find it yourself and send a pull request!). You can also use the [raphael playground](http://raphaeljs.com/playground.html) to reproduce your issues.
-
-Remember to add all the info that can be useful such as
-
-* error details
-* steps to reproduce
-* browser and its version
-* any suggestion of what do you think the problem could be
 
 ## Collaborators
 
@@ -61,6 +46,7 @@ Remember to add all the info that can be useful such as
 * [raphael.boilerplate](https://github.com/tomasAlabes/raphael-boilerplate)
 * [backbone.raphael](https://github.com/tomasAlabes/backbone.raphael)
 * [mapael](https://github.com/neveldo/jQuery-Mapael)
+* [snap](https://github.com/adobe-webplatform/Snap.svg)
 
 
 ## Books
