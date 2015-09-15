@@ -7,15 +7,7 @@
 // └────────────────────────────────────────────────────────────────────┘ \\
 
 (function (glob, factory) {
-    if (typeof define === "function" && define.amd) {
-        define("raphael.core", ["eve"], function(eve) {
-            return factory(eve);
-        });
-    } else if (typeof exports === "object") {
-        module.exports = factory(require("eve"));
-    } else {
-        glob.Raphael = factory(glob.eve);
-    }
+    glob.Raphael = factory(glob.RahaelEve);
 }(this, function (eve) {
     /*\
      * Raphael

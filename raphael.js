@@ -17,15 +17,7 @@
 // │ Author Dmitry Baranovskiy (http://dmitry.baranovskiy.com/) │ \\
 // └────────────────────────────────────────────────────────────┘ \\
 (function (glob, factory) {
-    if (typeof define === "function" && define.amd) {
-        define("eve", function() {
-            return factory();
-        });
-    } else if (typeof exports === "object") {
-        module.exports = factory();
-    } else {
-        glob.eve = factory();
-    }
+    glob.RahaelEve = factory();
 }(this, function(){
     var version = "0.4.2",
         has = "hasOwnProperty",
@@ -381,7 +373,7 @@
 }));
 
 // ┌────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2.1.4 - JavaScript Vector Library                      │ \\
+// │ Raphaël 2.2.0k - JavaScript Vector Library                      │ \\
 // ├────────────────────────────────────────────────────────────────────┤ \\
 // │ Core Module                                                        │ \\
 // ├────────────────────────────────────────────────────────────────────┤ \\
@@ -389,15 +381,7 @@
 // └────────────────────────────────────────────────────────────────────┘ \\
 
 (function (glob, factory) {
-    if (typeof define === "function" && define.amd) {
-        define("raphael.core", ["eve"], function(eve) {
-            return factory(eve);
-        });
-    } else if (typeof exports === "object") {
-        module.exports = factory(require("eve"));
-    } else {
-        glob.Raphael = factory(glob.eve);
-    }
+    glob.Raphael = factory(glob.RahaelEve);
 }(this, function (eve) {
     /*\
      * Raphael
@@ -466,7 +450,7 @@
             }
         }
     }
-    R.version = "2.1.4";
+    R.version = "2.2.0k";
     R.eve = eve;
     var loaded,
         separator = /[, ]+/,
@@ -5791,7 +5775,7 @@
 }));
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2.1.4 - JavaScript Vector Library                       │ \\
+// │ Raphaël 2.2.0k - JavaScript Vector Library                       │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ SVG Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -7216,7 +7200,7 @@
 }));
 
 // ┌─────────────────────────────────────────────────────────────────────┐ \\
-// │ Raphaël 2.1.4 - JavaScript Vector Library                       │ \\
+// │ Raphaël 2.2.0k - JavaScript Vector Library                       │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
 // │ VML Module                                                          │ \\
 // ├─────────────────────────────────────────────────────────────────────┤ \\
@@ -8122,6 +8106,7 @@
         var paperSize = this.getSize(),
             width = paperSize.width,
             height = paperSize.height,
+            size = 1 / mmax(w / width, h / height),
             H, W;
         if (fit) {
             H = height / h;
@@ -8137,7 +8122,7 @@
         this._viewBoxShift = {
             dx: -x,
             dy: -y,
-            scale: paperSize
+            scale: size
         };
         this.forEach(function (el) {
             el.transform("...");

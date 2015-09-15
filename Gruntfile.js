@@ -17,10 +17,6 @@ module.exports = function(grunt) {
             dist: {
                 src: "<%= concat.dist.dest %>",
                 dest: "<%= pkg.name %>-min.js"
-            },
-            nodeps: {
-                src: "<%= concat.nodeps.dest %>",
-                dest: "<%= pkg.name %>-nodeps-min.js"
             }
         },
         replace: {
@@ -34,7 +30,7 @@ module.exports = function(grunt) {
                 files: [{
                     expand: true,
                     flatten: true,
-                    src: ["<%= concat.dist.dest %>", "<%= concat.nodeps.dest %>"],
+                    src: ["<%= concat.dist.dest %>"],
                     dest: "./"
                 }]
             }
@@ -44,15 +40,6 @@ module.exports = function(grunt) {
                 dest: "<%= pkg.name %>.js",
                 src: [
                     "dev/eve.js",
-                    "dev/raphael.core.js",
-                    "dev/raphael.svg.js",
-                    "dev/raphael.vml.js",
-                    "dev/raphael.amd.js"
-                ]
-            },
-            nodeps: {
-                dest: "<%= pkg.name %>-nodeps.js",
-                src: [
                     "dev/raphael.core.js",
                     "dev/raphael.svg.js",
                     "dev/raphael.vml.js",

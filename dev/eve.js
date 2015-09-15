@@ -17,15 +17,7 @@
 // │ Author Dmitry Baranovskiy (http://dmitry.baranovskiy.com/) │ \\
 // └────────────────────────────────────────────────────────────┘ \\
 (function (glob, factory) {
-    if (typeof define === "function" && define.amd) {
-        define("eve", function() {
-            return factory();
-        });
-    } else if (typeof exports === "object") {
-        module.exports = factory();
-    } else {
-        glob.eve = factory();
-    }
+    glob.RahaelEve = factory();
 }(this, function(){
     var version = "0.4.2",
         has = "hasOwnProperty",
