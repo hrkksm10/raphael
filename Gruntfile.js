@@ -42,8 +42,7 @@ module.exports = function(grunt) {
                     "dev/eve.js",
                     "dev/raphael.core.js",
                     "dev/raphael.svg.js",
-                    "dev/raphael.vml.js",
-                    "dev/raphael.amd.js"
+                    "dev/raphael.vml.js"
                 ]
             }
         }
