@@ -5918,7 +5918,7 @@
             }
         }
         $(o, {
-            fill: "url('" + document.location.origin + document.location.pathname + "#" + id + "')",
+            fill: "url(#" + id + ")",
             opacity: 1,
             "fill-opacity": 1
         });
