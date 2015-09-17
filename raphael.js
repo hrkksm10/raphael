@@ -3782,6 +3782,9 @@
      | var t = paper.text(50, 50, "Raphaël\nkicks\nbutt!");
     \*/
     paperproto.text = function (x, y, text) {
+        if (R.vml) {
+            y = (y || 0) + 3.3;
+        }
         var out = R._engine.text(this, x || 0, y || 0, Str(text));
         this.__set__ && this.__set__.push(out);
         if (R.svg) {
