@@ -9,15 +9,7 @@
 // └─────────────────────────────────────────────────────────────────────┘ \\
 
 (function (glob, factory) {
-    if (typeof define === "function" && define.amd) {
-        define("raphael.vml", ["raphael.core"], function(raphael) {
-            return factory(raphael);
-        });
-    } else if (typeof exports === "object") {
-        factory(require("./raphael.core"));
-    } else {
-        factory(glob.Raphael);
-    }
+    factory(glob.Raphael);
 }(this, function(R) {
     if (R && !R.vml) {
         return;

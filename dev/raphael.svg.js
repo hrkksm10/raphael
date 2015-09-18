@@ -9,15 +9,7 @@
 // └─────────────────────────────────────────────────────────────────────┘ \\
 
 (function (glob, factory) {
-    if (typeof define === "function" && define.amd) {
-        define("raphael.svg", ["raphael.core"], function(raphael) {
-            return factory(raphael);
-        });
-    } else if (typeof exports === "object") {
-        factory(require("./raphael.core"));
-    } else {
-        factory(glob.Raphael);
-    }
+    factory(glob.Raphael);
 }(this, function(R) {
     if (R && !R.svg) {
         return;
@@ -614,7 +606,7 @@
         el._.dirty = 1;
         var bb = el._getBBox(),
             dif = a.y - (bb.y + bb.height / 2);
-        dif && R.is(dif, "finite") && $(tspans[0], {dy: dif});
+        if( bb.height ) dif && R.is(dif, "finite") && $(tspans[0], {dy: dif});
     },
     getRealNode = function (node) {
         if (node.parentNode && node.parentNode.tagName.toLowerCase() === "a") {
